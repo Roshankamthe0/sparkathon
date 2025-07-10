@@ -23,7 +23,7 @@ const Wallet = () => {
       <Text fontSize="4xl" fontWeight="bold" mt={4}>${amount}</Text>
       {amount === 100 && (
         <Text fontSize="md" mt={2} color="green.500">
-          🎉 Roshan Kamthe will send you $100
+          🎉 Roshan Kamthe sent you $100.
         </Text>
       )}
     </Box>
