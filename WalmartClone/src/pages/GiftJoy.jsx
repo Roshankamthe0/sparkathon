@@ -7,17 +7,19 @@ const GiftJoyPayment = () => {
 
   const handleInitialSubmit = (e) => {
     e.preventDefault();
-    const name = e.target.payerName.value.trim();
-    const email = e.target.payerEmail.value.trim();
+    const payerName = e.target.payerName.value.trim();
+    const payerEmail = e.target.payerEmail.value.trim();
+    const receiverName = e.target.receiverName.value.trim();
+    const receiverEmail = e.target.receiverEmail.value.trim();
     const amount = e.target.paymentAmount.value.trim();
     const message = e.target.paymentMessage.value.trim();
 
-    if (!name || !email || !amount) {
+    if (!payerName || !payerEmail || !receiverName || !receiverEmail || !amount) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    setTempData({ name, email, amount, message });
+    setTempData({ payerName, payerEmail, receiverName, receiverEmail, amount, message });
     setStep(2);
   };
 
@@ -58,12 +60,10 @@ const GiftJoyPayment = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(tempData),
       });
-      // Ignoring success or failure on purpose
     } catch (err) {
-      // Ignored on purpose
+      // Ignored
     }
 
-    // Always show receipt after 2.5 seconds
     setTimeout(() => {
       const transactionId = "TXN-" + Math.floor(100000 + Math.random() * 900000);
       const receiptNumber = "RCT-" + Math.floor(100000 + Math.random() * 900000);
@@ -134,8 +134,10 @@ const GiftJoyPayment = () => {
       {step === 1 && (
         <form onSubmit={handleInitialSubmit}>
           <h2>💳 GiftJoy</h2>
-          <input type="text" name="payerName" placeholder="Name" style={styles.input} />
-          <input type="email" name="payerEmail" placeholder="Email" style={styles.input} />
+          <input type="text" name="payerName" placeholder="Your Name" style={styles.input} />
+          <input type="email" name="payerEmail" placeholder="Your Email" style={styles.input} />
+          <input type="text" name="receiverName" placeholder="Receiver's Name" style={styles.input} />
+          <input type="email" name="receiverEmail" placeholder="Receiver's Email" style={styles.input} />
           <input type="number" name="paymentAmount" placeholder="Amount ($)" style={styles.input} />
           <textarea name="paymentMessage" placeholder="Note (optional)" style={styles.input} />
           <button type="submit" style={styles.button}>Make Payment</button>
@@ -163,9 +165,10 @@ const GiftJoyPayment = () => {
       {receipts.map((r, i) => (
         <div key={i} style={styles.receipt}>
           <strong>✅ Receipt</strong>
-          <p>Payer: {r.name} ({r.email})</p>
-          <p>Amount: ${r.amount}</p>
-          {r.message && <p>Note: {r.message}</p>}
+          <p><strong>Sender:</strong> {r.payerName} ({r.payerEmail})</p>
+          <p><strong>Receiver:</strong> {r.receiverName} ({r.receiverEmail})</p>
+          <p><strong>Amount:</strong> ${r.amount}</p>
+          {r.message && <p><strong>Note:</strong> {r.message}</p>}
           <p>Transaction ID: {r.transactionId}</p>
           <p>Receipt #: {r.receiptNumber}</p>
           <p><em>Date: {r.date}</em></p>
