@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -11,18 +11,30 @@ const AuthProvider = ({ children }) => {
   const [password, setPassword1] = useState("");
   const [number, setNumber1] = useState("");
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [search, searchItem] = useState('');
+  const [search, searchItem] = useState("");
   const [count, setCount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [productDetails, steProductDetails] = useState({
     image: "",
     title: null,
-    price: null
+    price: null,
   });
 
   // 💳 Wallet State
-  const [walletBalance, setWalletBalance] = useState(100);
+  const [walletBalance, setWalletBalance] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
+
+  // 🧠 Load wallet balance only for specific email
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("user-info"));
+    const userEmail = userInfo?.email;
+
+    if (userEmail === "siddheshkamthe8@gmail.com") {
+      setWalletBalance(100);
+    } else {
+      setWalletBalance(0);
+    }
+  }, []);
 
   // 🔄 Helpers
   function setDetails(image, title, price) {
@@ -52,6 +64,13 @@ const AuthProvider = ({ children }) => {
   function setEmail(email) {
     setEmail1(email);
     localStorage.setItem("user-info", JSON.stringify({ email }));
+
+    // 🧠 Update wallet based on email at time of login
+    if (email === "siddheshkamthe8@gmail.com") {
+      setWalletBalance(100);
+    } else {
+      setWalletBalance(0);
+    }
   }
 
   function setName(n, password) {
@@ -76,6 +95,9 @@ const AuthProvider = ({ children }) => {
   function signOut() {
     setAuth();
     setName1("");
+    setEmail1("");
+    setWalletBalance(0); // Reset wallet on sign out
+    localStorage.removeItem("user-info");
   }
 
   function clearCart() {
@@ -109,13 +131,11 @@ const AuthProvider = ({ children }) => {
         setDetails,
         productDetails,
         signOut,
-
-        // 👇 Wallet Support
         walletBalance,
         setWalletBalance,
         useWallet,
         setUseWallet,
-        clearCart
+        clearCart,
       }}
     >
       {children}
